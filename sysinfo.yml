@@ -1,0 +1,29 @@
+---
+- name: Get System Info
+  hosts: all
+  become: true
+  tasks:
+    - name: create file in /root/details.txt
+      ansible.builtin.copy:
+        dest: /root/details.txt
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          HOSTNAME: {{ ansible_hostname }}
+          MEMORY_TOTAL: {{ ansible_memtotal_mb }}
+          MEMORY_FREE: {{ ansible_memfree_mb }}
+          IPV4: {{ ansible_default_ipv4.address }}
+          FQDN: {{ ansible_fqdn }}
+          SDA_DISK_SIZE: {{ ansible_devices.sda.partitions.sda1.size }}
+          SDC_DISK_SIZE: {% if ansible_devices.sdc is defined %}{{ ansible_devices.sdc.partitions.sdc1.size }}{% else %}NONE{% endif %}
+
+# Create a playbook, which generates a file named “details.txt” file on each server with the following information:
+# The file should be placed in the root directory: /root
+# HOSTNAME: <hostname>
+# MEMORY_TOTAL: <Total actual memory should be presented here>
+# MEMORY_FREE: <Free Memory available on the system>
+# IPV4: <IP address of the system>
+# FQDN: <fqdn>
+# SDA_DISK_SIZE: </dev/sda1 disk size>
+# SDC_DISK_SIZE: </dev/sdc> #if disk is not attach,it should put NONE
